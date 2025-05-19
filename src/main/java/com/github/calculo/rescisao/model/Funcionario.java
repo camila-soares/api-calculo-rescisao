@@ -30,6 +30,9 @@ public class Funcionario implements Serializable {
 
     private boolean temFeriasVencidas;
 
+    @OneToOne(mappedBy = "funcionario", cascade = CascadeType.ALL)
+    private RescisaoFuncionario rescisaoFuncionario;
+
     public Long getId() {
         return id;
     }

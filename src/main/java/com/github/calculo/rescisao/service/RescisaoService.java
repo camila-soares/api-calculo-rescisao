@@ -4,7 +4,9 @@ package com.github.calculo.rescisao.service;
 import com.github.calculo.rescisao.dto.RescisaoDTO;
 import com.github.calculo.rescisao.enums.TipoRescisao;
 import com.github.calculo.rescisao.model.Funcionario;
+import com.github.calculo.rescisao.model.RescisaoFuncionario;
 import com.github.calculo.rescisao.repository.FuncionarioRepository;
+import com.github.calculo.rescisao.repository.RescisaoFuncionarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,13 +18,15 @@ import java.time.temporal.ChronoUnit;
 public class RescisaoService {
 
     private final FuncionarioRepository funcionarioRepository;
+    private final RescisaoFuncionarioRepository rescisaoFuncionarioRepository;
 
-    public RescisaoService(FuncionarioRepository funcionarioRepository) {
+    public RescisaoService(FuncionarioRepository funcionarioRepository, RescisaoFuncionarioRepository rescisaoFuncionarioRepository) {
         this.funcionarioRepository = funcionarioRepository;
+        this.rescisaoFuncionarioRepository = rescisaoFuncionarioRepository;
     }
 
     public RescisaoDTO calcularRescisao(Funcionario funcionario) {
-        funcionarioRepository.save(funcionario);
+
         LocalDate admissao = funcionario.getDataAdmissao();
         LocalDate demissao = funcionario.getDataDemissao();
         BigDecimal salario = funcionario.getSalarioMensal();
@@ -38,7 +42,8 @@ public class RescisaoService {
 
         // Comum a todos: férias vencidas
         if (funcionario.isTemFeriasVencidas()) {
-            feriasVencidas = salario.add(salario.divide(BigDecimal.valueOf(3), 2, RoundingMode.HALF_UP));
+            feriasVencidas = salario.add(salario.divide(BigDecimal.valueOf(3), 2,
+                    RoundingMode.HALF_UP));
         }
 
         switch (tipo) {
@@ -77,6 +82,18 @@ public class RescisaoService {
         dto.setAvisoPrevio(avisoPrevio);
         dto.setMultaFgts(multaFgts);
         dto.setTotal(total);
+        Funcionario funcionario1 = funcionarioRepository.save(funcionario);
+        RescisaoFuncionario funcionarioRescisao = new RescisaoFuncionario();
+        funcionarioRescisao.setFuncionario(funcionario1);
+        funcionarioRescisao.setSaldoSalario(saldoSalario);
+        funcionarioRescisao.setFeriasProporcionais(feriasProporcionais.add(umTercoFeriasProporcionais));
+        funcionarioRescisao.setDecimoTerceiro(decimoTerceiro);
+        funcionarioRescisao.setAvisoPrevio(avisoPrevio);
+        funcionarioRescisao.setMultaFgts(multaFgts);
+        funcionarioRescisao.setFeriasVencidas(feriasVencidas);
+        funcionarioRescisao.setTotal(total);
+
+        rescisaoFuncionarioRepository.save(funcionarioRescisao);
 
         return dto;
     }
