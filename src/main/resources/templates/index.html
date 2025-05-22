@@ -133,13 +133,13 @@
                 //console.info('RSPOSEE' + response.decimoTerceiro);
                 $('#resultado').html(`
                     <h3>Resultado da Rescisão:</h3>
-                    <p>Saldo Salário:${parseFloat(response.saldoSalario).toFixed(2)}</p>
-                    <p>Férias Vencidas: ${parseFloat(response.feriasVencidas).toFixed(2)}</p>
-                    <p>Férias Proporcionais: ${parseFloat(response.feriasProporcionais).toFixed(2)}</p>
-                    <p>Décimo Terceiro: ${parseFloat(response.decimoTerceiro).toFixed(2)}</p>
-                    <p>Aviso Prévio: ${parseFloat(response.avisoPrevio).toFixed(2)}</p>
-                    <p>Multa FGTS: ${parseFloat(response.multaFgts).toFixed(2)}</p>
-                    <p><strong>Total: ${parseFloat(response.total).toFixed(2)}</strong></p>
+                    <p>Saldo Salário:${(response.saldoSalario).toFixed(2) + 0   }</p>
+                    <p>Férias Vencidas: ${(response.feriasVencidas).toFixed(2) + 0}</p>
+                    <p>Férias Proporcionais: ${(response.feriasProporcionais).toFixed(2) + 0}</p>
+                    <p>Décimo Terceiro: ${(response.decimoTerceiro).toFixed(2) + 0}</p>
+                    <p>Aviso Prévio: ${(response.avisoPrevio).toFixed(2) + 0}</p>
+                    <p>Multa FGTS: ${(response.multaFgts).toFixed(2) + 0}</p>
+                    <p><strong>Total: ${(response.total).toFixed(2) + 0}</strong></p>
                 `);
 
             }).fail(function (xhr, status, errorThrown) {
