@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <form style="padding-top: 20px; padding-bottom: 20px" id="formcheckout">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="nome">Nome:</label>
+                <input type="text" class="form-control"  id="nome" required="required" style="height: 40px;">
+            </div>
+
+            <div class="form-group col-md-6">
+                <label for="salarioMensal">Salario:</label>
+                <input type="text" class="form-control" id="salarioMensal" required="required" style="height: 40px;">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="dataAdmissao">Data Admissão:</label>
+                <input type="date" class="form-control" id="dataAdmissao" required="required" style="height: 40px;">
+            </div>
+
+            <div class="form-group col-md-6">
+                <label for="dataDemissao">Data Demisssão:</label>
+                <input type="date"  class="form-control" id="dataDemissao" required="required" style="height: 40px;">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="tipoRescisao">Tipo Demissão:</label>
+                <select class="form-control" required="required" id="tipoRescisao" style="height: 40px;">
+                    <option value="">[-Selecione-]</option>
+                    <option value="SEM_JUSTA_CAUSA">Sem Justa Causa</option>
+                    <option value="JUSTA_CAUSA">Justa Causa</option>
+                    <option value="PEDIDO_DEMISSAO">Pedido de demissão</option>
+                </select>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="temFeriasVencidas">Ano de validade:</label>
+                <select class="form-control" required="required" id="temFeriasVencidas" style="height: 40px;">
+                    <option value="">[--Selecione --]</option>
+                    <option value="true">SIM</option>
+                    <option value="false">NÃo</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <input id="buttonrealizarCalculo" onclick="realizarCalculo();" type="button" class="btn btn-primary btn-lg" value="Realizar Pagamento" style="font-size: 23px;height: 50px; width: 100%">
+            </div>
+        </div>
+    </form>
+    <div id="resultado" style="margin-left: 100px;"></div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function(){
+        $('#salarioMensal').mask('000.000.000', {reverse: true});
+    });
+
+    function formatarValor(valor) {
+        return parseFloat(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+
+    function realizarCalculo(){
+
+        var nome = $('#nome').val();
+        var salarioMensal = $('#salarioMensal').val();
+        var dataAdmissao = $('#dataAdmissao').val();
+        var dataDemissao = $('#dataDemissao').val();
+        var tipoRescisao = $('#tipoRescisao').val();
+        var temFeriasVencidas = $('#temFeriasVencidas').val() === 'true';
+
+
+        if(!salarioMensal){
+            alert('Informe o Salario Mensal.');
+            return;
+        }
+
+        if(!dataAdmissao){
+            alert('Informe a Data de Admissao');
+            return;
+        }
+
+        if(dataDemissao.trim() == ''){
+            alert('Informe a Data de demissao.');
+            return;
+        }
+
+        if(tipoRescisao.trim() == ''){
+            alert('Informe o tipo de rescisao.');
+            return;
+        }
+
+        document.getElementById('buttonrealizarCalculo').disabled = true;
+        document.getElementById('buttonrealizarCalculo').value = 'Efetuando Calculo...';
+
+
+        $.ajax({
+            method: 'POST',
+            url: '/api/rescisao/calcular',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                nome: nome,
+                salarioMensal: salarioMensal,
+                dataAdmissao: dataAdmissao,
+                dataDemissao: dataDemissao,
+                tipoRescisao: tipoRescisao,
+                temFeriasVencidas: temFeriasVencidas
+                })
+            }).done(function (response) {
+                    document.getElementById('buttonrealizarCalculo').disabled = true;
+                    document.getElementById('buttonrealizarCalculo').value = 'Sucesso, OK... Pago';
+
+                //console.info('RSPOSEE' + response.decimoTerceiro);
+                $('#resultado').html(`
+                    <h3>Resultado da Rescisão:</h3>
+                    <p>Saldo Salário:${parseFloat(response.saldoSalario).toFixed(2)}</p>
+                    <p>Férias Vencidas: ${parseFloat(response.feriasVencidas).toFixed(2)}</p>
+                    <p>Férias Proporcionais: ${parseFloat(response.feriasProporcionais).toFixed(2)}</p>
+                    <p>Décimo Terceiro: ${parseFloat(response.decimoTerceiro).toFixed(2)}</p>
+                    <p>Aviso Prévio: ${parseFloat(response.avisoPrevio).toFixed(2)}</p>
+                    <p>Multa FGTS: ${parseFloat(response.multaFgts).toFixed(2)}</p>
+                    <p><strong>Total: ${parseFloat(response.total).toFixed(2)}</strong></p>
+                `);
+
+            }).fail(function (xhr, status, errorThrown) {
+
+                document.getElementById('buttonrealizarCalculo').disabled = false;
+                document.getElementById('buttonrealizarCalculo').value = 'Realizar Pagamento';
+
+                alert('Erro ao efetuar pagamento: ' + errorThrown);
+            });
+    }
+</script>
+
+</body>
+</html>

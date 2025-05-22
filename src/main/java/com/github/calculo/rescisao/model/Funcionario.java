@@ -24,10 +24,8 @@ public class Funcionario implements Serializable {
     private BigDecimal salarioMensal;
     private LocalDate dataAdmissao;
     private LocalDate dataDemissao;
-
     @Enumerated(EnumType.STRING)
     private TipoRescisao tipoRescisao;
-
     private boolean temFeriasVencidas;
 
     @OneToOne(mappedBy = "funcionario", cascade = CascadeType.ALL)

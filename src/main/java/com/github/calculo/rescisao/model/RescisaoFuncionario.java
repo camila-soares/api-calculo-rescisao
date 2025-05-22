@@ -23,6 +23,7 @@ public class RescisaoFuncionario implements Serializable {
     private BigDecimal avisoPrevio;
     private BigDecimal multaFgts;
     private BigDecimal total;
+
     @OneToOne
     @JoinColumn(name = "funcionario_id")
     private Funcionario funcionario;

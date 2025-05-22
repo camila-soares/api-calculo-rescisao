@@ -3,35 +3,44 @@ package com.github.calculo.rescisao.controller;
 
 import com.github.calculo.rescisao.dto.RescisaoDTO;
 import com.github.calculo.rescisao.model.Funcionario;
+import com.github.calculo.rescisao.model.RescisaoFuncionario;
 import com.github.calculo.rescisao.repository.FuncionarioRepository;
+import com.github.calculo.rescisao.repository.RescisaoFuncionarioRepository;
 import com.github.calculo.rescisao.service.RescisaoService;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.io.ByteArrayOutputStream;
 import java.time.format.DateTimeFormatter;
 
-@RestController
+@Controller
 @RequestMapping("/api/rescisao")
+//@CrossOrigin(value = "http://localhost:4200")
 public class RescisaoController {
 
     private final RescisaoService rescisaoService;
+    private final RescisaoFuncionarioRepository rescisaoFuncionarioRepository;
     private final FuncionarioRepository funcionarioRepository;
-    public RescisaoController(RescisaoService rescisaoService, FuncionarioRepository funcionarioRepository) {
+    public RescisaoController(RescisaoService rescisaoService, RescisaoFuncionarioRepository rescisaoFuncionarioRepository, FuncionarioRepository funcionarioRepository) {
         this.rescisaoService = rescisaoService;
+        this.rescisaoFuncionarioRepository = rescisaoFuncionarioRepository;
         this.funcionarioRepository = funcionarioRepository;
     }
 
     @PostMapping("/calcular")
     public ResponseEntity<RescisaoDTO> calcularRescisao(@RequestBody Funcionario funcionario) {
         RescisaoDTO dto = rescisaoService.calcularRescisao(funcionario);
-        return ResponseEntity.ok(dto);
+        if (dto != null) {
+            return ResponseEntity.ok(dto);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @GetMapping("/{id}/pdf")
@@ -39,7 +48,8 @@ public class RescisaoController {
         Funcionario f = funcionarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Funcionário não encontrado"));
 
-        RescisaoDTO dto = rescisaoService.calcularRescisao(f);
+        RescisaoFuncionario dto = rescisaoFuncionarioRepository.findByIdFuncionario(f.getRescisaoFuncionario().getFuncionario().getId());
+      //  RescisaoDTO dto = rescisaoService.calcularRescisao(f);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Document document = new Document();
