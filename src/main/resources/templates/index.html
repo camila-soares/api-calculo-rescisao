@@ -63,7 +63,7 @@
 
         <div class="form-row">
             <div class="form-group col-md-12">
-                <input id="buttonrealizarCalculo" onclick="realizarCalculo();" type="button" class="btn btn-primary btn-lg" value="Realizar Pagamento" style="font-size: 23px;height: 50px; width: 100%">
+                <input id="buttonrealizarCalculo" onclick="realizarCalculo();" type="button" class="btn btn-primary btn-lg" value="Realizar Calculo" style="font-size: 23px;height: 50px; width: 100%">
             </div>
         </div>
     </form>
@@ -127,13 +127,13 @@
                 temFeriasVencidas: temFeriasVencidas
                 })
             }).done(function (response) {
-                    document.getElementById('buttonrealizarCalculo').disabled = true;
-                    document.getElementById('buttonrealizarCalculo').value = 'Sucesso, OK... Pago';
+                    // document.getElementById('buttonrealizarCalculo').disabled = true;
+                    // document.getElementById('buttonrealizarCalculo').value = 'Calculo, OK... Pago';
 
                 //console.info('RSPOSEE' + response.decimoTerceiro);
                 $('#resultado').html(`
                     <h3>Resultado da Rescisão:</h3>
-                    <p>Saldo Salário:${(response.saldoSalario).toFixed(2) + 0   }</p>
+                    <p>Saldo Salário:${(response.saldoSalario).toFixed(2) + 0}</p>
                     <p>Férias Vencidas: ${(response.feriasVencidas).toFixed(2) + 0}</p>
                     <p>Férias Proporcionais: ${(response.feriasProporcionais).toFixed(2) + 0}</p>
                     <p>Décimo Terceiro: ${(response.decimoTerceiro).toFixed(2) + 0}</p>
@@ -141,7 +141,8 @@
                     <p>Multa FGTS: ${(response.multaFgts).toFixed(2) + 0}</p>
                     <p><strong>Total: ${(response.total).toFixed(2) + 0}</strong></p>
                 `);
-
+             document.getElementById('buttonrealizarCalculo').disabled = false;
+            // document.getElementById('buttonrealizarCalculo').value = 'Sucesso, OK... Pago';
             }).fail(function (xhr, status, errorThrown) {
 
                 document.getElementById('buttonrealizarCalculo').disabled = false;
